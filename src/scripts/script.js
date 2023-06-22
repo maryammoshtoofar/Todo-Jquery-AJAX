@@ -1,6 +1,6 @@
 const URL = "http://localhost:3000/todos";
 let selectedTodoID = null;
-
+let CharSize = false;
 function deleteTodo(id) {
   $.ajax({
     url: `${URL}/${id}`,
@@ -31,6 +31,9 @@ function handleEditTodo(id) {
 }
 
 $(function () {
+  const taskName = $("#task");
+  const cat = $("#cat");
+  const date = $("#date");
   const description = $("#description");
   const submitBtn = $("#submit");
   function generateTodo(todo) {
@@ -68,20 +71,27 @@ $(function () {
   getAlltodos();
 
   description.on("input", function () {
+    checkFomValidation();
     const textCount = $("#text-count");
     const charactersLeft = 100 - $(this).val().length;
     const spanText = `${charactersLeft} characters left`;
     textCount.text(spanText);
     if (charactersLeft <= 0) {
+      CharSize = false;
       textCount.removeClass("text-green-600");
       textCount.addClass("text-red-600");
       $(this).addClass("border-2 border-rose-500 focus:border-2");
     } else {
+      CharSize = true;
       textCount.addClass("text-green-600");
       textCount.removeClass("text-red-600");
       $(this).removeClass("border-2 border-rose-500 focus:border-2");
     }
   });
+
+  taskName.on("input", checkFomValidation);
+  cat.on("change", checkFomValidation);
+  date.on("change", checkFomValidation);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -130,4 +140,18 @@ $(function () {
     });
   }
   submitBtn.on("click", handleSubmit);
+
+  function checkFomValidation() {
+    if (
+      taskName.val() &&
+      cat.val() &&
+      date.val() &&
+      description.val() &&
+      CharSize
+    ) {
+      submitBtn.prop("disabled", false);
+    } else {
+      submitBtn.prop("disabled", true);
+    }
+  }
 });
